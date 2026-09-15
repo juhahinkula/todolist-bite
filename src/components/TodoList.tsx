@@ -1,12 +1,9 @@
 import { useState } from "react";
-
-type Priority = "low" | "medium" | "high";
-
-type Todo = {
-  description: string;
-  priority: Priority;
-  duedate: string;
-}
+import type { Todo, Priority } from "../types";
+import TodoTable from "./TodoTable";
+import Button from '@mui/material/Button';
+import TextField from '@mui/material/TextField';
+import Stack from '@mui/material/Stack';
 
 function TodoList() {
   const [todo, setTodo] = useState<Todo>({
@@ -38,14 +35,28 @@ function TodoList() {
 
   return(
     <>
-      <div id="inputs">
-        <input 
-          placeholder="Enter todo description..."
+      <Stack 
+        direction="row" 
+        spacing={2}
+        sx={{
+          justifyContent: 'center',
+          alignItems: 'center',
+          mt: 2
+        }}
+      >
+        <TextField
+          label="Description"
           value={todo.description}
           onChange={e => 
             setTodo({ ...todo, description: e.target.value })}
         />
-        <select 
+        <TextField
+          select
+          slotProps={{
+            select: {
+              native: true
+            }
+          }}
           value={todo.priority}
           onChange={e => 
             setTodo({ ...todo, priority: e.target.value as Priority })}
@@ -53,38 +64,16 @@ function TodoList() {
           <option value="low">Low</option>
           <option value="medium">Medium</option>
           <option value="high">High</option>
-        </select>
-        <input 
-          placeholder="Enter todo duedate..."
+        </TextField>
+        <TextField
           type="date"
           value={todo.duedate}
           onChange={e => 
             setTodo({ ...todo, duedate: e.target.value })}
         />
-        <button onClick={handleAdd}>Add</button>
-      </div>
-      <table>
-        <thead>
-          <tr>
-            <th>Description</th>
-            <th>Priority</th>
-            <th>Due date</th>
-            <th> </th>
-          </tr>
-        </thead>
-        <tbody>
-          {
-            todos.map((todo: Todo, index) => 
-              <tr>
-                <td>{todo.description}</td>
-                <td>{todo.priority}</td>
-                <td>{todo.duedate}</td>
-                <td><button onClick={() => handleDelete(index)}>Delete</button></td>
-              </tr>
-            )
-          }
-        </tbody>
-      </table>
+        <Button variant="contained" onClick={handleAdd}>Add</Button>
+      </Stack>
+      <TodoTable todos={todos} handleDelete={handleDelete} />
     </>
   );
 }
