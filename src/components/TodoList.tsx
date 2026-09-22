@@ -4,14 +4,32 @@ import TodoTable from "./TodoTable";
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Stack from '@mui/material/Stack';
+import { v4 as uuidv4 } from 'uuid';
+import { DataGrid } from "@mui/x-data-grid";
+import type { GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
 
 function TodoList() {
   const [todo, setTodo] = useState<Todo>({
+    id: "",
     description: "",
     priority: "low",
     duedate: "",
   })
   const [todos, setTodos] = useState<Todo[]>([]);
+
+  const columns: GridColDef[] = [
+    { field: "description", width: 400, headerName: "Description" },
+    { field: "priority", headerName: "Priority" },
+    { field: "duedate", headerName: "Due date"  },
+    {
+      field: "id",
+      headerName: " ",
+      renderCell: (params: GridRenderCellParams) =>
+        <Button onClick={() => handleDelete(params.row.id)} color="error" size="small">
+          Delete
+        </Button>
+    }
+  ]
 
   const handleAdd = () => {
     if (!todo.description) {
@@ -19,17 +37,18 @@ function TodoList() {
       return;
     }
 
-    setTodos([todo, ...todos]);
+    setTodos([{ ...todo, id: uuidv4() }, ...todos]);
     setTodo({
+      id: "",
       description: "",
       priority: "low",
       duedate: ""
     })
   }
 
-  const handleDelete = (row: number) => {
+  const handleDelete = (id: string) => {
     if (window.confirm("Are you sure?")) {
-      setTodos(todos.filter((_, index) => index !== row ));
+      setTodos(todos.filter((todo) => todo.id !== id ));
     }
   }
 
@@ -73,7 +92,9 @@ function TodoList() {
         />
         <Button variant="contained" onClick={handleAdd}>Add</Button>
       </Stack>
-      <TodoTable todos={todos} handleDelete={handleDelete} />
+      <div style={{ width: '90%', height: 500, margin: 'auto' }}>
+        <DataGrid rowSelection={false} columns={columns} rows={todos} />
+      </div>
     </>
   );
 }
